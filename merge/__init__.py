@@ -6,6 +6,7 @@ from dotenv import dotenv_values, find_dotenv
 class Config:
     __package = "merge"
     __version = "0.0.1"
+    __default_env = "dev"
     __config_dir = Path().home() / ".config" / __package
     __logfile_name = f"{__package}-{__version}.log"
     __config = dotenv_values(find_dotenv())
@@ -24,7 +25,11 @@ class Config:
 
     @classmethod
     def version(cls) -> str:
-        return cls__version
+        return cls.__version
+
+    @classmethod
+    def default_env(cls) -> str:
+        return cls.__default_env
 
     @classmethod
     def config_dir(cls) -> Path:

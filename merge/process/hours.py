@@ -11,7 +11,7 @@ def get_active_members() -> list[JSON]:
     ragic = Ragic()
     route = Config.ragic_attendance_route()
     result = ragic.get_data(route).json()
-    entries = [] 
+    entries = []
     for record in result.values():
         if record["Timeclock Status"] == "Open":
             Logger.info(f"Found active member {str(record)}")
@@ -36,7 +36,7 @@ def get_timecards(members: list[JSON], days: int = 7) -> list[JSON]:
             if record["employeeNumber"] == member["Membership ID"]:
                 Logger.info(f"Found matching timecard {str(record)}")
                 entries.append({**member, **record})
-    return entries 
+    return entries
 
 
 def get_hours_detail(data: list[JSON]) -> list[JSON]:
