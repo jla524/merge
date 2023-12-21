@@ -32,6 +32,8 @@ def get_timecards(members: list[JSON], days: int = 7) -> list[JSON]:
             "userFullName": member["Full Name2"],
         }
         result = open_time_clock.get_data(route, params).json()
+        if not result:
+            continue
         for record in result.get("data", []):
             if record["employeeNumber"] == member["Membership ID"]:
                 Logger.info(f"Found matching timecard {str(record)}")
