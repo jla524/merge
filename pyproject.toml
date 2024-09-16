@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "merge"
+version = "0.1.0"
+description = ""
+authors = ["Jacky Lee <jla524@sfu.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.31.0"
+python-dotenv = "^1.0.0"
+colorama = "^0.4.6"
+colorlog = "^6.8.0"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+historical = "merge.main:historical"
+weekly = "merge.main:weekly"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
