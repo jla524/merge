@@ -11,7 +11,7 @@ python-dotenv = "^1.0.0"
 colorama = "^0.4.6"
 colorlog = "^6.8.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 
 [tool.poetry.scripts]
 historical = "merge.main:historical"
