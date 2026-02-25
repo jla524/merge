@@ -19,6 +19,20 @@ def get_active_members() -> list[JSON]:
     return entries
 
 
+# TODO: impute sign out time with this function
+# we may want to return a dict with Event ID as key to support fast lookup
+def get_current_opportunities() -> list[JSON]:
+    ragic = Ragic()
+    route = Config.ragic_opportunities_route()
+    result = ragic.get_data(route).json()
+    entries = []
+    for record in result.values():
+        if record["Status"] == "IN-PROGRESS":
+            Logger.info(f"Found current opportunity {str(record)}")
+            entries.append(record)
+    return entries
+
+
 def get_timecards(members: list[JSON], days: int = 7) -> list[JSON]:
     open_time_clock = OpenTimeClock()
     entries = []

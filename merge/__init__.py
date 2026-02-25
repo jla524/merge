@@ -13,6 +13,7 @@ class Config:
     __env = __config["APP_ENV"]
     __ragic_api_key = __config["RAGIC_API_KEY"]
     __ragic_attendance_route = "lynvolunteer/lyn-temp/9"
+    __ragic_opportunity_route = "lynvolunteer/lyn-temp/5"
     __ragic_hours_detail_route = "lynvolunteer/lyn-temp/110"
     __ragic_live_hours_route = "lynvolunteer/lyn-temp/104"
     __otc_company_id = __config["OTC_COMPANY_ID"]
@@ -50,6 +51,10 @@ class Config:
     @classmethod
     def ragic_attendance_route(cls) -> str:
         return cls.__ragic_attendance_route
+
+    @classmethod
+    def ragic_opportunity_route(cls) -> str:
+        return cls.__ragic_opportunity_route
 
     @classmethod
     def ragic_hours_detail_route(cls) -> str:
