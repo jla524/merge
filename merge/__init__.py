@@ -1,3 +1,4 @@
+import sys
 from typing import Optional
 from pathlib import Path
 from dotenv import dotenv_values, find_dotenv
@@ -10,15 +11,20 @@ class Config:
     __config_dir = Path().home() / ".config" / __package
     __logfile_name = f"{__package}-{__version}.log"
     __config = dotenv_values(find_dotenv())
-    __env = __config["APP_ENV"]
-    __ragic_api_key = __config["RAGIC_API_KEY"]
     __ragic_attendance_route = "lynvolunteer/lyn-temp/9"
     __ragic_opportunity_route = "lynvolunteer/lyn-temp/5"
     __ragic_hours_detail_route = "lynvolunteer/lyn-temp/110"
     __ragic_live_hours_route = "lynvolunteer/lyn-temp/104"
-    __otc_company_id = __config["OTC_COMPANY_ID"]
-    __otc_developer_token = __config["OTC_DEVELOPER_TOKEN"]
     __otc_timecards_route = "t1QueryTimeCards"
+
+    try:
+        __env = __config["APP_ENV"]
+        __ragic_api_key = __config["RAGIC_API_KEY"]
+        __otc_company_id = __config["OTC_COMPANY_ID"]
+        __otc_developer_token = __config["OTC_DEVELOPER_TOKEN"]
+    except KeyError as error:
+        sys.stderr.write(f"Dotenv config error: {error} is missing\n")
+        sys.exit(1)
 
     @classmethod
     def package(cls) -> str:

@@ -2,6 +2,7 @@ import sys
 import logging
 from logging.config import dictConfig
 from pathlib import Path
+from threading import Lock
 from colorama import init, Back, Fore
 from merge import Config
 from merge.logger import LOGGING_CONFIG
@@ -9,7 +10,19 @@ from merge.logger import LOGGING_CONFIG
 init(autoreset=True)
 
 
-class LoggerLoader:
+class _SingletonMeta(type):
+    _instances: dict = {}
+    _lock = Lock()
+
+    def __call__(cls, *args, **kwargs):
+        with cls._lock:
+            if cls not in cls._instances:
+                instance = super().__call__(*args, **kwargs)
+                cls._instances[cls] = instance
+        return cls._instances[cls]
+
+
+class LoggerLoader(metaclass=_SingletonMeta):
     def __init__(self):
         self.__log_dump: Path = Config.config_dir()
         self.__load_config()
@@ -59,7 +72,7 @@ class LoggerLoader:
         return logger
 
 
-class Logger:
+class Logger(metaclass=_SingletonMeta):
     __logger = LoggerLoader().load()
 
     @classmethod
