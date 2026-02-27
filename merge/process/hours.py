@@ -7,6 +7,18 @@ from merge.common.enums import HoursDetail, LiveHours
 from merge.logger.pkg_logger import Logger
 
 
+def _get_current_opportunities() -> list[JSON]:
+    ragic = Ragic()
+    route = Config.ragic_opportunity_route()
+    result = ragic.get_data(route).json()
+    entries = []
+    for record in result.values():
+        if record["Status"] == "IN-PROGRESS":
+            Logger.info(f"Found current opportunity {str(record)}")
+            entries.append(record)
+    return entries
+
+
 def get_active_members() -> list[JSON]:
     ragic = Ragic()
     route = Config.ragic_attendance_route()
@@ -15,20 +27,6 @@ def get_active_members() -> list[JSON]:
     for record in result.values():
         if record["Timeclock Status"] == "Open":
             Logger.info(f"Found active member {str(record)}")
-            entries.append(record)
-    return entries
-
-
-# TODO: impute sign out time with this function
-# we may want to return a dict with Event ID as key to support fast lookup
-def get_current_opportunities() -> list[JSON]:
-    ragic = Ragic()
-    route = Config.ragic_opportunity_route()
-    result = ragic.get_data(route).json()
-    entries = []
-    for record in result.values():
-        if record["Status"] == "IN-PROGRESS":
-            Logger.info(f"Found current opportunity {str(record)}")
             entries.append(record)
     return entries
 
@@ -53,6 +51,19 @@ def get_timecards(members: list[JSON], days: int = 7) -> list[JSON]:
                 Logger.info(f"Found matching timecard {str(record)}")
                 entries.append({**member, **record})
     return entries
+
+
+def impute_signout_time(timecards: list[JSON]) -> list[JSON]:
+    # NOTE: we can only impute if the event ID exists in the time card
+    # it is rare that volunteers sign in and not sign out
+    # TODO: see if "hours" need to be updated too
+    opportunities = _get_current_opportunities()
+    end_times = {opportunity["Event ID"]: opportunity["End Date"] for opportunity in opportunities}
+    print(end_times)
+    for timecard in timecards:
+        if timecard["outDateTime"] == "":
+            print(timecard)
+    return timecards
 
 
 def get_hours_detail(data: list[JSON]) -> list[JSON]:
@@ -84,15 +95,6 @@ def get_hours_detail(data: list[JSON]) -> list[JSON]:
     return entries
 
 
-def send_hours_detail(payloads: list[JSON]) -> None:
-    ragic = Ragic()
-    route = Config.ragic_hours_detail_route()
-    for payload in payloads:
-        Logger.info(f"Sending payload {str(payload)}")
-        result = ragic.send_data(route, data=payload).json()
-        Logger.info(f"Received result {str(result)}")
-
-
 def get_live_hours(data: list[JSON]) -> list[JSON]:
     entries = []
     for row in data:
@@ -108,6 +110,15 @@ def get_live_hours(data: list[JSON]) -> list[JSON]:
         }
         entries.append(entry)
     return entries
+
+
+def send_hours_detail(payloads: list[JSON]) -> None:
+    ragic = Ragic()
+    route = Config.ragic_hours_detail_route()
+    for payload in payloads:
+        Logger.info(f"Sending payload {str(payload)}")
+        result = ragic.send_data(route, data=payload).json()
+        Logger.info(f"Received result {str(result)}")
 
 
 def send_live_hours(payloads: list[JSON]) -> None:
